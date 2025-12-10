@@ -14,8 +14,12 @@ const App: React.FC = () => {
     wpUrl: '',
     wpUser: '',
     wpAppPassword: '',
+    // SOTA Configuration Defaults
     autoPublishThreshold: 85,
     concurrencyLimit: 3,
+    enableSchema: true,
+    enableStickyBar: true,
+    // AI Brain Configuration
     aiProvider: 'gemini',
     aiApiKey: '',
     aiModel: 'gemini-2.5-flash'

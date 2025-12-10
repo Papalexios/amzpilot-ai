@@ -13,6 +13,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSave, initialConfig 
       ...initialConfig,
       autoPublishThreshold: initialConfig.autoPublishThreshold || 85,
       concurrencyLimit: initialConfig.concurrencyLimit || 3,
+      enableSchema: initialConfig.enableSchema ?? true,
+      enableStickyBar: initialConfig.enableStickyBar ?? true,
       aiProvider: initialConfig.aiProvider || 'gemini',
       aiModel: initialConfig.aiModel || 'gemini-2.5-flash',
       aiApiKey: initialConfig.aiApiKey || '',
@@ -22,7 +24,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSave, initialConfig 
   });
   
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'wp' | 'amazon' | 'ai'>('wp');
+  const [activeTab, setActiveTab] = useState<'wp' | 'amazon' | 'ai' | 'sota'>('wp');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,6 +70,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSave, initialConfig 
              <button onClick={() => setActiveTab('wp')} className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider ${activeTab === 'wp' ? 'text-brand-500 border-b-2 border-brand-500' : 'text-gray-500 hover:text-gray-300'}`}>WordPress</button>
              <button onClick={() => setActiveTab('amazon')} className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider ${activeTab === 'amazon' ? 'text-brand-500 border-b-2 border-brand-500' : 'text-gray-500 hover:text-gray-300'}`}>Amazon API</button>
              <button onClick={() => setActiveTab('ai')} className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider ${activeTab === 'ai' ? 'text-brand-500 border-b-2 border-brand-500' : 'text-gray-500 hover:text-gray-300'}`}>AI Brain</button>
+             <button onClick={() => setActiveTab('sota')} className={`flex-1 py-3 text-sm font-bold uppercase tracking-wider ${activeTab === 'sota' ? 'text-brand-500 border-b-2 border-brand-500' : 'text-gray-500 hover:text-gray-300'}`}>SOTA</button>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 overflow-y-auto">
@@ -213,6 +216,42 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSave, initialConfig 
                                 {config.aiProvider === 'anthropic' && <option value="claude-3-opus-20240229">Claude 3 Opus</option>}
                             </select>
                         )}
+                    </div>
+                </div>
+            )}
+            
+            {/* SOTA TAB */}
+            {activeTab === 'sota' && (
+                <div className="space-y-6 animate-fade-in">
+                    <p className="text-gray-400 text-sm">Configure advanced SOTA features.</p>
+                    
+                    <div className="flex items-center justify-between p-4 bg-dark-950 border border-dark-700 rounded-xl">
+                        <div>
+                            <div className="text-sm font-bold text-white mb-1">JSON-LD Schema</div>
+                            <div className="text-xs text-gray-500">Inject SEO structured data for Google.</div>
+                        </div>
+                        <button type="button" onClick={() => setConfig({...config, enableSchema: !config.enableSchema})} className={`w-12 h-6 rounded-full transition-colors relative ${config.enableSchema ? 'bg-green-500' : 'bg-gray-700'}`}>
+                            <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${config.enableSchema ? 'left-7' : 'left-1'}`}></div>
+                        </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-dark-950 border border-dark-700 rounded-xl">
+                        <div>
+                            <div className="text-sm font-bold text-white mb-1">Mobile Sticky Bar</div>
+                            <div className="text-xs text-gray-500">Show floating "Check Price" bar on mobile.</div>
+                        </div>
+                        <button type="button" onClick={() => setConfig({...config, enableStickyBar: !config.enableStickyBar})} className={`w-12 h-6 rounded-full transition-colors relative ${config.enableStickyBar ? 'bg-green-500' : 'bg-gray-700'}`}>
+                            <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${config.enableStickyBar ? 'left-7' : 'left-1'}`}></div>
+                        </button>
+                    </div>
+
+                    <div>
+                        <label className="text-xs text-brand-500 font-bold uppercase mb-1 block">Auto-Publish Threshold ({config.autoPublishThreshold}%)</label>
+                        <input type="range" min="50" max="100" className="w-full accent-brand-500" value={config.autoPublishThreshold} onChange={e => setConfig({...config, autoPublishThreshold: parseInt(e.target.value)})} />
+                    </div>
+                    <div>
+                        <label className="text-xs text-brand-500 font-bold uppercase mb-1 block">Concurrency ({config.concurrencyLimit} threads)</label>
+                        <input type="range" min="1" max="10" className="w-full accent-brand-500" value={config.concurrencyLimit} onChange={e => setConfig({...config, concurrencyLimit: parseInt(e.target.value)})} />
                     </div>
                 </div>
             )}
