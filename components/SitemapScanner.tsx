@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { BlogPost, SitemapState, AppConfig } from '../types';
 import { fetchAndParseSitemap, fetchPageContent, checkForAffiliateLinks, runConcurrent, analyzeContentAndFindProduct, generateProductBoxHtml, insertIntoContent, pushToWordPress } from '../utils';
@@ -17,7 +16,6 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
   const [stopSignal, setStopSignal] = useState(false);
   const [isFullyAuto, setIsFullyAuto] = useState(false);
   
-  // Throttled State Ref for High-Frequency Updates
   const stateRef = useRef(savedState);
   useEffect(() => { stateRef.current = savedState; }, [savedState]);
 
@@ -54,14 +52,13 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
     const targets = savedState.posts.filter(p => p.monetizationStatus === 'opportunity' && p.autoPilotStatus !== 'published');
     const postMap = new Map(savedState.posts.map(p => [p.url, p]));
 
-    // Update UI Throttler
     let updateTimer: any = null;
     const triggerUIUpdate = () => {
         if (updateTimer) return;
         updateTimer = setTimeout(() => {
             onStateChange({ ...stateRef.current, posts: Array.from(postMap.values()) });
             updateTimer = null;
-        }, 500); // 2fps updates to prevent lag
+        }, 500); 
     };
 
     await runConcurrent(targets, config.concurrencyLimit || 3, async (post: BlogPost) => {
@@ -113,14 +110,41 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
   }), [savedState.posts]);
 
   return (
-    <div className="flex min-h-screen bg-dark-950 flex-col md:flex-row">
-      <div className="w-full md:w-64 bg-dark-900 border-r border-dark-800 flex flex-col p-6 md:fixed h-auto md:h-full z-10 backdrop-blur-sm relative">
+    <div className="flex flex-col h-full bg-dark-950 md:flex-row relative">
+      
+      {/* Mobile Sticky HUD Header */}
+      <div className="md:hidden sticky top-0 z-30 bg-dark-950/80 backdrop-blur-xl border-b border-dark-800 p-4">
+        <div className="flex items-center justify-between mb-4">
+           <h1 className="text-xl font-black text-white tracking-tight">Amz<span className="text-brand-500">Pilot</span></h1>
+           <div className="flex gap-2">
+                <button onClick={() => setIsFullyAuto(!isFullyAuto)} className={`px-2 py-1 rounded text-[10px] font-bold uppercase border ${isFullyAuto ? 'border-green-500 text-green-500 bg-green-500/10' : 'border-dark-700 text-gray-500'}`}>
+                    Auto: {isFullyAuto ? 'ON' : 'OFF'}
+                </button>
+           </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+            <div className="bg-dark-900 rounded p-2 text-center border border-dark-800">
+                <div className="text-[10px] text-gray-500 uppercase font-bold">Total</div>
+                <div className="text-sm font-black text-white">{stats.total}</div>
+            </div>
+            <div className="bg-yellow-900/10 rounded p-2 text-center border border-yellow-900/30">
+                <div className="text-[10px] text-yellow-500 uppercase font-bold">Needs Links</div>
+                <div className="text-sm font-black text-white">{stats.opportunities}</div>
+            </div>
+            <div className="bg-green-900/10 rounded p-2 text-center border border-green-900/30">
+                <div className="text-[10px] text-green-500 uppercase font-bold">Done</div>
+                <div className="text-sm font-black text-white">{stats.monetized}</div>
+            </div>
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex w-64 bg-dark-900 border-r border-dark-800 flex-col p-6 z-10 relative">
           <div className="flex justify-between items-center mb-8">
              <h1 className="text-2xl font-black text-white">Amz<span className="text-brand-500">Pilot</span></h1>
-             <button onClick={handleReset} className="md:hidden text-xs text-red-500 font-bold border border-red-900 rounded px-2 py-1">RESET</button>
           </div>
           
-          <div className="space-y-4 grid grid-cols-2 md:grid-cols-1 gap-4">
+          <div className="space-y-4">
               <div className="bg-dark-950 p-4 rounded-xl border border-dark-800">
                   <div className="text-xs text-gray-500 uppercase font-bold">Total</div>
                   <div className="text-2xl font-black text-white">{stats.total}</div>
@@ -131,41 +155,62 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
               </div>
           </div>
           
-          <button onClick={handleReset} className="hidden md:block mt-auto text-xs text-red-500 hover:text-red-400 font-bold border border-red-900/50 rounded-lg py-3 hover:bg-red-900/20 transition-all">
+          <button onClick={handleReset} className="mt-auto text-xs text-red-500 hover:text-red-400 font-bold border border-red-900/50 rounded-lg py-3 hover:bg-red-900/20 transition-all">
              <i className="fa-solid fa-trash mr-2"></i> Wipe Data
           </button>
       </div>
 
-      <div className="flex-1 md:ml-64 p-4 md:p-8 overflow-y-auto">
-        <div className="bg-dark-900 border border-dark-800 rounded-2xl p-4 mb-8 flex flex-col lg:flex-row gap-4 items-center justify-between shadow-xl sticky top-0 z-20 backdrop-blur-md bg-opacity-90">
-             <form onSubmit={handleFetchSitemap} className="w-full flex-1 flex gap-2">
-                <input type="url" value={sitemapUrl} onChange={e => setSitemapUrl(e.target.value)} placeholder="https://yoursite.com/post-sitemap.xml" className="flex-1 bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-brand-500 outline-none text-sm font-mono min-w-0" />
-                <button type="submit" disabled={status !== 'idle'} className="bg-white text-dark-900 font-bold px-6 rounded-xl hover:bg-gray-200 whitespace-nowrap">{status === 'scanning' ? 'Scanning...' : 'Sync'}</button>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* Command Bar */}
+        <div className="bg-dark-900/50 backdrop-blur-md border-b border-dark-800 p-4 flex flex-col md:flex-row gap-4 items-center z-20">
+             <form onSubmit={handleFetchSitemap} className="w-full flex gap-2">
+                <input type="url" value={sitemapUrl} onChange={e => setSitemapUrl(e.target.value)} placeholder="https://yoursite.com/post-sitemap.xml" className="flex-1 bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-brand-500 outline-none text-sm font-mono min-w-0 shadow-inner" />
+                <button type="submit" disabled={status !== 'idle'} className="bg-white text-dark-900 font-bold px-6 rounded-xl hover:bg-gray-200 whitespace-nowrap active:scale-95 transition-transform">{status === 'scanning' ? '...' : 'Sync'}</button>
              </form>
-             <div className="w-full lg:w-auto flex items-center justify-end gap-2 border-t lg:border-t-0 lg:border-l border-dark-700 pt-4 lg:pt-0 pl-0 lg:pl-4">
-                 <button onClick={() => setIsFullyAuto(!isFullyAuto)} className={`px-3 py-2 rounded text-xs font-bold whitespace-nowrap ${isFullyAuto ? 'bg-green-500 text-black' : 'bg-dark-800 text-gray-500'}`}>Auto: {isFullyAuto ? 'ON' : 'OFF'}</button>
-                 <button onClick={status === 'processing' ? () => setStopSignal(true) : runAutonomousPipeline} className={`flex-1 lg:flex-none px-6 py-3 rounded-xl font-bold text-white shadow-lg whitespace-nowrap ${status === 'processing' ? 'bg-red-600' : 'bg-brand-600 hover:bg-brand-500'}`}>
-                    {status === 'processing' ? 'STOP' : 'RUN AUTO-PILOT'}
-                 </button>
-             </div>
+             <button onClick={status === 'processing' ? () => setStopSignal(true) : runAutonomousPipeline} className={`w-full md:w-auto px-6 py-3 rounded-xl font-bold text-white shadow-lg whitespace-nowrap active:scale-95 transition-transform ${status === 'processing' ? 'bg-red-600' : 'bg-brand-600 hover:bg-brand-500'}`}>
+                {status === 'processing' ? 'STOP' : 'RUN AUTO-PILOT'}
+             </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-24">
-             {savedState.posts.map(post => (
-                 <div key={post.id} className="bg-dark-900/50 border border-dark-800 hover:border-dark-600 rounded-xl p-5 group relative">
-                     <div className="flex justify-between items-start mb-2">
-                         <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${post.monetizationStatus === 'monetized' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                             {post.monetizationStatus === 'opportunity' ? 'Needs Links' : post.monetizationStatus}
-                         </span>
-                         {post.aiConfidence && <span className="text-brand-400 text-xs font-bold">{post.aiConfidence}%</span>}
-                     </div>
-                     <h3 className="font-bold text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed" title={post.title}>{post.title}</h3>
-                     <button onClick={() => onPostSelect(post)} className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 ${post.monetizationStatus === 'monetized' ? 'bg-dark-800 text-gray-400' : 'bg-brand-600 text-white hover:bg-brand-500 transition-colors'}`}>
-                         {post.monetizationStatus === 'monetized' ? 'Edit Box' : 'Monetize Now'} <i className="fa-solid fa-arrow-right"></i>
-                     </button>
-                 </div>
-             ))}
+        {/* Scrollable Grid */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-32 md:pb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {savedState.posts.map(post => (
+                    <div key={post.id} onClick={() => onPostSelect(post)} className="bg-dark-900/40 backdrop-blur border border-dark-800 rounded-xl p-5 group relative cursor-pointer active:scale-[0.98] transition-all hover:bg-dark-800 hover:border-brand-500/30 shadow-lg">
+                        <div className="flex justify-between items-start mb-2">
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${post.monetizationStatus === 'monetized' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                                {post.monetizationStatus === 'opportunity' ? 'Needs Links' : post.monetizationStatus}
+                            </span>
+                            {post.aiConfidence && <span className="text-brand-400 text-xs font-bold">{post.aiConfidence}%</span>}
+                        </div>
+                        <h3 className="font-bold text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed" title={post.title}>{post.title}</h3>
+                        <div className="flex items-center text-xs font-bold text-gray-500 group-hover:text-brand-400 transition-colors">
+                            {post.monetizationStatus === 'monetized' ? 'Edit Box' : 'Monetize Now'} <i className="fa-solid fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            
+            {savedState.posts.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-64 text-gray-600">
+                    <i className="fa-solid fa-robot text-4xl mb-4 text-dark-800"></i>
+                    <p className="text-sm">Enter sitemap to start scanning</p>
+                </div>
+            )}
         </div>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 w-full bg-dark-900/90 backdrop-blur-xl border-t border-dark-800 p-2 flex justify-around z-50 pb-safe">
+          <button className="flex flex-col items-center p-2 text-brand-500">
+              <i className="fa-solid fa-radar text-xl mb-1"></i>
+              <span className="text-[10px] font-bold">Scan</span>
+          </button>
+          <button onClick={handleReset} className="flex flex-col items-center p-2 text-gray-500 hover:text-red-500">
+              <i className="fa-solid fa-trash text-xl mb-1"></i>
+              <span className="text-[10px] font-bold">Reset</span>
+          </button>
       </div>
     </div>
   );
