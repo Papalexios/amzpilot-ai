@@ -108,11 +108,12 @@ export const runConcurrent = async <T, R>(
   return results;
 };
 
-// CORS PROXY FALLBACK
+// CORS PROXY FALLBACK (Triple Redundancy)
 const fetchWithProxy = async (url: string) => {
     const proxies = [
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${url}`
     ];
     for (const proxyUrl of proxies) {
         try {
@@ -120,7 +121,7 @@ const fetchWithProxy = async (url: string) => {
             if (response.ok) return response;
         } catch (e) { console.warn(`Proxy failed: ${proxyUrl}`); }
     }
-    throw new Error("Proxy Error: Could not fetch URL. Check internet.");
+    throw new Error("Proxy Error: All proxies failed. Check internet connection.");
 };
 
 export const testConnection = async (config: AppConfig): Promise<{ success: boolean; message: string }> => {
@@ -406,11 +407,24 @@ export const generateProductBoxHtml = (product: ProductDetails, affiliateTag: st
   const uniqueId = `amz-${Math.random().toString(36).substr(2, 9)}`;
   const reset = `all: unset; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; line-height: 1.5; color: #1e293b; display: block;`;
 
-  // SOTA v16: Mobile Sticky Bar
+  // SOTA v17: Heartbeat Animation Injection
+  const styles = `
+    <style>
+      @keyframes amz-pulse-${uniqueId} {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+      }
+      .amz-btn-pulse-${uniqueId} {
+        animation: amz-pulse-${uniqueId} 2s infinite;
+      }
+    </style>
+  `;
+
   let stickyHtml = '';
   if (enableStickyBar && cleanAsin) {
       stickyHtml = `
-      <div id="${uniqueId}-sticky" style="${reset} position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 12px 16px; border-top: 1px solid #e2e8f0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 2147483647; display: none; justify-content: space-between; align-items: center; transform: translateY(100%); transition: transform 0.3s ease;">
+      <div id="${uniqueId}-sticky" style="${reset} position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 12px 16px; border-top: 1px solid #e2e8f0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99999; display: none; justify-content: space-between; align-items: center; transform: translateY(100%); transition: transform 0.3s ease;">
           <div style="${reset} display: flex; flex-direction: column;">
              <span style="font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 800; letter-spacing: 0.5px;">Best Price</span>
              <span style="font-weight: 900; color: #0f172a; font-size: 15px;">${product.price}</span>
@@ -436,6 +450,7 @@ export const generateProductBoxHtml = (product: ProductDetails, affiliateTag: st
     <!-- wp:html -->
     <div id="${uniqueId}" class="amz-sota-box" style="${reset} margin: 3rem auto; max-width: 800px; background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); overflow: hidden; position: relative;">
       ${schemaHtml}
+      ${styles}
       
       <!-- Verified Header -->
       <div style="${reset} background: #f8fafc; border-bottom: 1px solid #f1f5f9; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;">
@@ -479,7 +494,7 @@ export const generateProductBoxHtml = (product: ProductDetails, affiliateTag: st
 
            <div style="${reset} margin-top: auto; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 16px;">
               <span style="font-size: 1.6rem; font-weight: 900; color: #0f172a;">${product.price}</span>
-              <a href="${link}" target="_blank" rel="nofollow sponsored" style="${reset} background: #0f172a; color: white; padding: 12px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none;">Check Price &rarr;</a>
+              <a href="${link}" target="_blank" rel="nofollow sponsored" class="amz-btn-pulse-${uniqueId}" style="${reset} background: #0f172a; color: white; padding: 12px 28px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none;">Check Price &rarr;</a>
            </div>
         </div>
       </div>

@@ -75,11 +75,11 @@ export const PostEditor: React.FC<{ post: BlogPost, config: AppConfig, onBack: (
   };
 
   return (
-    <div className="flex h-screen bg-dark-950">
-        <div className="w-96 bg-dark-900 border-r border-dark-800 flex flex-col z-10 shadow-2xl">
+    <div className="flex h-screen bg-dark-950 flex-col md:flex-row">
+        <div className="w-full md:w-96 bg-dark-900 border-r border-dark-800 flex flex-col z-10 shadow-2xl h-1/2 md:h-full">
             <div className="p-4 border-b border-dark-800 flex items-center justify-between">
                 <button onClick={onBack} className="text-gray-400 hover:text-white"><i className="fa-solid fa-arrow-left"></i> Back</button>
-                <div className="text-xs font-bold text-gray-500">Editor v16.0</div>
+                <div className="text-xs font-bold text-gray-500">Editor v17.0</div>
             </div>
             
             <div className="p-6 flex-1 overflow-y-auto">
@@ -124,11 +124,13 @@ export const PostEditor: React.FC<{ post: BlogPost, config: AppConfig, onBack: (
                     {status === 'pushing' ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-rocket"></i>}
                     <span>Update Live Post</span>
                 </button>
-                <button onClick={() => { if(product) navigator.clipboard.writeText(generateProductBoxHtml(product, config.amazonTag)); Toastify({ text: "Copied!", backgroundColor: "#8b5cf6" }).showToast(); }} className="w-full bg-dark-800 hover:bg-white hover:text-dark-900 text-white font-bold py-2 rounded-xl text-xs">Copy HTML Code</button>
+                <button onClick={() => { if(product) navigator.clipboard.writeText(generateProductBoxHtml(product, config.amazonTag)); Toastify({ text: "Copied!", backgroundColor: "#8b5cf6" }).showToast(); }} className="w-full bg-dark-800 hover:bg-white hover:text-dark-900 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <i className="fa-regular fa-copy"></i> Copy HTML Code
+                </button>
             </div>
         </div>
 
-        <div className="flex-1 bg-gray-100 flex flex-col relative overflow-hidden">
+        <div className="flex-1 bg-gray-100 flex flex-col relative overflow-hidden h-1/2 md:h-full">
             <div className="absolute top-4 right-4 flex bg-white rounded-lg shadow p-1 z-20 gap-2">
                 <div className="flex bg-gray-100 rounded p-1">
                     <button onClick={() => setViewTab('visual')} className={`px-3 py-1 text-xs font-bold rounded ${viewTab==='visual'?'bg-white shadow':''}`}>Visual</button>
@@ -137,8 +139,8 @@ export const PostEditor: React.FC<{ post: BlogPost, config: AppConfig, onBack: (
                 </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-10 flex justify-center items-start bg-gray-50" ref={previewRef}>
-                <div className="bg-white shadow-2xl w-[900px] rounded-xl min-h-[1200px] border border-gray-200">
+            <div className="flex-1 overflow-y-auto p-4 md:p-10 flex justify-center items-start bg-gray-50" ref={previewRef}>
+                <div className="bg-white shadow-2xl w-full max-w-[900px] rounded-xl min-h-[1200px] border border-gray-200">
                     {viewTab === 'visual' && <div className="p-8 prose max-w-none" dangerouslySetInnerHTML={{ __html: html }} />}
                     {viewTab === 'code' && <pre className="p-4 text-xs bg-gray-900 text-green-400 overflow-auto h-full">{html}</pre>}
                     {viewTab === 'schema' && (

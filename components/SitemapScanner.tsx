@@ -38,6 +38,14 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
     }
   };
 
+  const handleReset = () => {
+      if(confirm("Are you sure? This will wipe all scanned data.")) {
+          onStateChange({ url: '', posts: [] });
+          setSitemapUrl('');
+          Toastify({ text: "Data Wiped", backgroundColor: "#ef4444" }).showToast();
+      }
+  };
+
   const runAutonomousPipeline = async () => {
     if (!config.wpUrl) return Toastify({ text: "Configure WP first", backgroundColor: "#f59e0b" }).showToast();
     
@@ -105,10 +113,14 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
   }), [savedState.posts]);
 
   return (
-    <div className="flex min-h-screen bg-dark-950">
-      <div className="w-64 bg-dark-900 border-r border-dark-800 hidden md:flex flex-col p-6 fixed h-full z-10 backdrop-blur-sm">
-          <div className="mb-8"><h1 className="text-2xl font-black text-white">Amz<span className="text-brand-500">Auto</span></h1></div>
-          <div className="space-y-4">
+    <div className="flex min-h-screen bg-dark-950 flex-col md:flex-row">
+      <div className="w-full md:w-64 bg-dark-900 border-r border-dark-800 flex flex-col p-6 md:fixed h-auto md:h-full z-10 backdrop-blur-sm relative">
+          <div className="flex justify-between items-center mb-8">
+             <h1 className="text-2xl font-black text-white">Amz<span className="text-brand-500">Pilot</span></h1>
+             <button onClick={handleReset} className="md:hidden text-xs text-red-500 font-bold border border-red-900 rounded px-2 py-1">RESET</button>
+          </div>
+          
+          <div className="space-y-4 grid grid-cols-2 md:grid-cols-1 gap-4">
               <div className="bg-dark-950 p-4 rounded-xl border border-dark-800">
                   <div className="text-xs text-gray-500 uppercase font-bold">Total</div>
                   <div className="text-2xl font-black text-white">{stats.total}</div>
@@ -118,17 +130,21 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
                   <div className="text-2xl font-black text-white">{stats.opportunities}</div>
               </div>
           </div>
+          
+          <button onClick={handleReset} className="hidden md:block mt-auto text-xs text-red-500 hover:text-red-400 font-bold border border-red-900/50 rounded-lg py-3 hover:bg-red-900/20 transition-all">
+             <i className="fa-solid fa-trash mr-2"></i> Wipe Data
+          </button>
       </div>
 
-      <div className="flex-1 md:ml-64 p-8 overflow-y-auto">
-        <div className="bg-dark-900 border border-dark-800 rounded-2xl p-4 mb-8 flex gap-4 items-center justify-between shadow-xl sticky top-0 z-20 backdrop-blur-md bg-opacity-90">
-             <form onSubmit={handleFetchSitemap} className="flex-1 flex gap-2">
-                <input type="url" value={sitemapUrl} onChange={e => setSitemapUrl(e.target.value)} placeholder="https://yoursite.com/post-sitemap.xml" className="flex-1 bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-brand-500 outline-none text-sm font-mono" />
-                <button type="submit" disabled={status !== 'idle'} className="bg-white text-dark-900 font-bold px-6 rounded-xl hover:bg-gray-200">{status === 'scanning' ? 'Scanning...' : 'Sync'}</button>
+      <div className="flex-1 md:ml-64 p-4 md:p-8 overflow-y-auto">
+        <div className="bg-dark-900 border border-dark-800 rounded-2xl p-4 mb-8 flex flex-col lg:flex-row gap-4 items-center justify-between shadow-xl sticky top-0 z-20 backdrop-blur-md bg-opacity-90">
+             <form onSubmit={handleFetchSitemap} className="w-full flex-1 flex gap-2">
+                <input type="url" value={sitemapUrl} onChange={e => setSitemapUrl(e.target.value)} placeholder="https://yoursite.com/post-sitemap.xml" className="flex-1 bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-brand-500 outline-none text-sm font-mono min-w-0" />
+                <button type="submit" disabled={status !== 'idle'} className="bg-white text-dark-900 font-bold px-6 rounded-xl hover:bg-gray-200 whitespace-nowrap">{status === 'scanning' ? 'Scanning...' : 'Sync'}</button>
              </form>
-             <div className="flex items-center gap-2 border-l border-dark-700 pl-4">
-                 <button onClick={() => setIsFullyAuto(!isFullyAuto)} className={`px-3 py-2 rounded text-xs font-bold ${isFullyAuto ? 'bg-green-500 text-black' : 'bg-dark-800 text-gray-500'}`}>Auto-Publish: {isFullyAuto ? 'ON' : 'OFF'}</button>
-                 <button onClick={status === 'processing' ? () => setStopSignal(true) : runAutonomousPipeline} className={`px-6 py-3 rounded-xl font-bold text-white shadow-lg ${status === 'processing' ? 'bg-red-600' : 'bg-brand-600 hover:bg-brand-500'}`}>
+             <div className="w-full lg:w-auto flex items-center justify-end gap-2 border-t lg:border-t-0 lg:border-l border-dark-700 pt-4 lg:pt-0 pl-0 lg:pl-4">
+                 <button onClick={() => setIsFullyAuto(!isFullyAuto)} className={`px-3 py-2 rounded text-xs font-bold whitespace-nowrap ${isFullyAuto ? 'bg-green-500 text-black' : 'bg-dark-800 text-gray-500'}`}>Auto: {isFullyAuto ? 'ON' : 'OFF'}</button>
+                 <button onClick={status === 'processing' ? () => setStopSignal(true) : runAutonomousPipeline} className={`flex-1 lg:flex-none px-6 py-3 rounded-xl font-bold text-white shadow-lg whitespace-nowrap ${status === 'processing' ? 'bg-red-600' : 'bg-brand-600 hover:bg-brand-500'}`}>
                     {status === 'processing' ? 'STOP' : 'RUN AUTO-PILOT'}
                  </button>
              </div>
@@ -143,8 +159,8 @@ export const SitemapScanner: React.FC<SitemapScannerProps> = ({ onPostSelect, sa
                          </span>
                          {post.aiConfidence && <span className="text-brand-400 text-xs font-bold">{post.aiConfidence}%</span>}
                      </div>
-                     <h3 className="font-bold text-gray-200 text-sm mb-4 line-clamp-2" title={post.title}>{post.title}</h3>
-                     <button onClick={() => onPostSelect(post)} className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 ${post.monetizationStatus === 'monetized' ? 'bg-dark-800 text-gray-400' : 'bg-brand-600 text-white'}`}>
+                     <h3 className="font-bold text-gray-200 text-sm mb-4 line-clamp-2 leading-relaxed" title={post.title}>{post.title}</h3>
+                     <button onClick={() => onPostSelect(post)} className={`w-full py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 ${post.monetizationStatus === 'monetized' ? 'bg-dark-800 text-gray-400' : 'bg-brand-600 text-white hover:bg-brand-500 transition-colors'}`}>
                          {post.monetizationStatus === 'monetized' ? 'Edit Box' : 'Monetize Now'} <i className="fa-solid fa-arrow-right"></i>
                      </button>
                  </div>
