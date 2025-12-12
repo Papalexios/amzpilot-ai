@@ -7,54 +7,65 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
   return (
-    <div className="min-h-screen bg-dark-950 text-white flex flex-col font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-dark-950 text-white flex flex-col font-sans relative overflow-hidden selection:bg-brand-500 selection:text-white">
       
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-600/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      {/* Dynamic Background Effects */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
       </div>
 
-      {/* Header / Nav */}
-      <nav className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex items-center gap-3">
-          {/* Artistic SOTA Logo */}
-          <div className="w-10 h-10 bg-gradient-to-br from-brand-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20 rotate-3 hover:rotate-6 transition-transform">
-             <i className="fa-solid fa-bolt text-white text-xl"></i>
+      {/* Navigation */}
+      <nav className="relative z-20 w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        {/* Artistic SOTA Logo */}
+        <div className="flex items-center gap-3 group cursor-default">
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-400 to-purple-600 rounded-xl rotate-3 group-hover:rotate-12 transition-transform duration-500 ease-out opacity-80"></div>
+            <div className="absolute inset-0 bg-dark-900 rounded-xl rotate-3 scale-90 group-hover:scale-95 transition-transform duration-500"></div>
+            <i className="fa-solid fa-rocket text-transparent bg-clip-text bg-gradient-to-br from-brand-400 to-purple-400 text-2xl relative z-10 transform -rotate-3 group-hover:rotate-0 transition-all"></i>
           </div>
-          <span className="text-2xl font-black tracking-tighter">Amz<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">Pilot</span></span>
+          <div className="flex flex-col">
+            <span className="text-2xl font-black tracking-tighter leading-none">Amz<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">Pilot</span></span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Autonomous Core</span>
+          </div>
         </div>
         
         <a 
           href="https://affiliatemarketingforsuccess.com" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-brand-500 pb-1"
+          className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-400 transition-all border-b border-transparent hover:border-brand-500/50 pb-1"
         >
-          From the creators of <span className="text-brand-400">AffiliateMarketingForSuccess.com</span>
+          From the creators of AffiliateMarketingForSuccess.com
         </a>
       </nav>
 
-      {/* Main Hero Content */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 py-20">
-        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up">
+      {/* Hero Section */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto space-y-10 animate-fade-in-up">
           
-          <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight">
-            The Future of <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-purple-400 to-pink-400">Autonomous Monetization</span>
+          <div className="inline-block px-4 py-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 backdrop-blur-sm mb-4">
+             <span className="text-brand-300 text-xs font-bold uppercase tracking-widest">v3.0 System Online</span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight tracking-tighter">
+            Automate Your <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-purple-400 to-pink-400 animate-gradient-x">Affiliate Empire</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Scan your WordPress content. Identify missed opportunities. Deploy high-conversion SOTA product boxes instantly with AI.
+          <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light">
+            The world's first <span className="text-white font-medium">Autonomous WordPress Monetization Engine</span>. 
+            Scan content, identify opportunities, and deploy high-conversion assets with military-grade precision.
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-8 w-full">
             <button 
               onClick={onEnter}
-              className="group relative px-8 py-4 bg-white text-dark-950 font-black text-lg rounded-full shadow-2xl shadow-white/20 hover:shadow-white/40 hover:scale-105 transition-all duration-300"
+              className="w-full md:w-auto group relative px-8 py-5 bg-white text-dark-950 font-black text-lg rounded-2xl shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.5)] hover:scale-105 transition-all duration-300 overflow-hidden"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Launch App <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-white opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                Initialize App <i className="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
               </span>
             </button>
 
@@ -62,9 +73,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
               href="https://seo-hub.affiliatemarketingforsuccess.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 rounded-full border border-dark-700 hover:border-brand-500/50 hover:bg-dark-900/50 text-gray-300 hover:text-white font-bold transition-all duration-300 flex items-center gap-2"
+              className="w-full md:w-auto px-8 py-5 rounded-2xl border border-brand-500/30 bg-dark-900/50 hover:bg-brand-900/20 text-brand-300 hover:text-brand-200 font-bold transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-brand-500/20 backdrop-blur-sm group"
             >
-              <i className="fa-solid fa-gem text-brand-500"></i> Dominate Your Niche
+              <i className="fa-solid fa-gem text-brand-500 group-hover:scale-110 transition-transform"></i> 
+              <span>Dominate Your Niche – Unlock Your Complete AI-Powered SEO Arsenal</span>
             </a>
           </div>
 
@@ -72,24 +84,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
       </main>
 
       {/* SOTA Footer */}
-      <footer className="relative z-10 bg-dark-900/80 backdrop-blur-xl border-t border-dark-800 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="relative z-10 bg-dark-950/80 border-t border-dark-800/50 backdrop-blur-xl mt-auto">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-12">
             
-            {/* Brand Column */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-               <img 
-                 src="https://affiliatemarketingforsuccess.com/wp-content/uploads/2023/03/cropped-Affiliate-Marketing-for-Success-Logo-Edited.png?lm=6666FEE0" 
-                 alt="Affiliate Marketing For Success" 
-                 className="h-12 w-auto mb-4 opacity-90 hover:opacity-100 transition-opacity"
-               />
-               <p className="text-xs text-gray-500 font-medium">
-                 Created by <span className="text-white">Alexios Papaioannou</span>,<br/> Owner of AffiliateMarketingForSuccess.com
-               </p>
+            {/* Brand / Owner Column */}
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 max-w-md">
+               <a href="https://affiliatemarketingforsuccess.com" target="_blank" rel="noopener noreferrer" className="block hover:opacity-80 transition-opacity">
+                 <img 
+                   src="https://affiliatemarketingforsuccess.com/wp-content/uploads/2023/03/cropped-Affiliate-Marketing-for-Success-Logo-Edited.png?lm=6666FEE0" 
+                   alt="Affiliate Marketing For Success" 
+                   className="h-16 w-auto"
+                 />
+               </a>
+               <div className="space-y-2">
+                 <p className="text-sm text-gray-400 font-medium">
+                   This App is Created by <span className="text-white font-bold">Alexios Papaioannou</span>
+                 </p>
+                 <p className="text-xs text-brand-500 uppercase tracking-widest font-bold">
+                   Owner of affiliatemarketingforsuccess.com
+                 </p>
+               </div>
             </div>
 
-            {/* Links Column */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+            {/* Links Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 w-full lg:w-auto">
                {[
                  { name: "Affiliate Marketing", url: "https://affiliatemarketingforsuccess.com/affiliate-marketing" },
                  { name: "AI", url: "https://affiliatemarketingforsuccess.com/ai" },
@@ -102,22 +121,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
                    href={link.url}
                    target="_blank"
                    rel="noopener noreferrer" 
-                   className="text-sm font-bold text-gray-400 hover:text-brand-400 transition-colors uppercase tracking-wide"
+                   className="group flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
                  >
+                   <span className="w-1.5 h-1.5 rounded-full bg-brand-500/50 group-hover:bg-brand-400 transition-colors"></span>
                    {link.name}
                  </a>
                ))}
             </div>
-
-            {/* Social / Extra */}
-            <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-all"><i className="fa-brands fa-twitter"></i></a>
-              <a href="#" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-gray-400 hover:bg-brand-600 hover:text-white transition-all"><i className="fa-brands fa-linkedin"></i></a>
-            </div>
           </div>
           
-          <div className="mt-12 pt-8 border-t border-dark-800 text-center text-xs text-gray-600">
-            &copy; {new Date().getFullYear()} AmzPilot AI. All rights reserved.
+          <div className="mt-16 pt-8 border-t border-dark-800/50 text-center flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
+            <p>&copy; {new Date().getFullYear()} Alexios Papaioannou. All rights reserved.</p>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-gray-400 cursor-pointer transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-gray-400 cursor-pointer transition-colors">Terms of Service</a>
+            </div>
           </div>
         </div>
       </footer>
