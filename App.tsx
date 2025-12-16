@@ -55,7 +55,9 @@ const App: React.FC = () => {
           <PostEditor 
             post={selectedPost} 
             config={config} 
-            onBack={() => { setSelectedPost(null); setCurrentStep(AppStep.SITEMAP); }} 
+            onBack={() => { setSelectedPost(null); setCurrentStep(AppStep.SITEMAP); }}
+            allPosts={sitemapData.posts}
+            onSwitchPost={setSelectedPost}
           />
         )}
       </main>

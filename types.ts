@@ -38,7 +38,11 @@ export interface ProductDetails {
   lastUpdated?: number; 
   url?: string;
   schema?: string; // JSON-LD
+  contextSnippet?: string; // The H2/H3 header text to insert after (for listicles)
 }
+
+export type PostPriority = 'critical' | 'high' | 'medium' | 'low';
+export type PostType = 'review' | 'listicle' | 'info' | 'unknown';
 
 export interface BlogPost {
   id: number;
@@ -47,9 +51,15 @@ export interface BlogPost {
   status: 'draft' | 'publish';
   content: string; 
   date?: string;
+  
+  // Intelligence Fields
+  priority?: PostPriority;
+  postType?: PostType;
   monetizationStatus?: 'analyzing' | 'monetized' | 'opportunity' | 'error' | 'queued';
+  
   autoPilotStatus?: 'idle' | 'analyzing' | 'found' | 'publishing' | 'published' | 'failed';
   proposedProduct?: ProductDetails;
+  detectedProducts?: ProductDetails[]; // For multi-product posts
   aiConfidence?: number;
   processingLog?: string[]; 
 }
@@ -60,7 +70,7 @@ export interface SitemapState {
   lastScanned?: number;
 }
 
-export type InsertionMethod = 'top' | 'bottom' | 'smart_middle' | 'after_h2';
+export type InsertionMethod = 'top' | 'bottom' | 'smart_middle' | 'after_h2' | 'context_match';
 
 export enum AppStep {
   CONFIG = 'CONFIG',
